@@ -237,13 +237,29 @@ function MonthlyInvoiceModal({ cases, companies, categories, settings, feeRates,
   const htmlArgs = { invoiceNo, issueDate, month:selMonth, co, lines:included, notes, settings };
   const html     = buildInvoiceHTML(htmlArgs);
 
-  function handleDownload() {
-    const blob=new Blob([html],{type:"text/html;charset=utf-8"});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement("a");
-    a.href=url; a.download=`請求書_${co?.label}_${MONTH_LABELS[selMonth]}.html`;
-    a.click(); URL.revokeObjectURL(url);
-    setShowBulk(true);
+  async function handleDownload() {
+    try {
+      const res = await fetch('/api/invoice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          invoiceNo, issueDate, month: selMonth,
+          co, lines: included, notes, settings
+        }),
+      })
+      if (!res.ok) throw new Error('PDF生成失敗')
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `請求書_${co?.label}_${MONTH_LABELS[selMonth]}.pdf`
+      a.click()
+      URL.revokeObjectURL(url)
+      setShowBulk(true)
+    } catch(e) {
+      alert('PDF生成に失敗しました。もう一度お試しください。')
+      console.error(e)
+    }
   }
 
   const targetCaseNames = [...new Set(included.map(l=>l.company_name))];
