@@ -48,14 +48,14 @@ function calcFeeAmount(contractAmount: number|null, companyId: string, categoryI
 }
 
 // 案件の総成約金額（items合計）
-function totalContractAmount(c: Case) {
+function totalContractAmount(c) {
   return (c.items||[]).reduce((s,it)=>s+(Number(it.contract_amount)||0), 0);
 }
 
 // ── Shared styles ──────────────────────────────────────
 const inp = { width:"100%", padding:"8px 10px", borderRadius:"6px", border:"1px solid #e5e7eb", fontSize:"14px", color:"#111827", background:"#fff", boxSizing:"border-box", outline:"none", fontFamily:"inherit" };
 const lbl = { display:"block", fontSize:"11px", fontWeight:600, color:"#9ca3af", marginBottom:"5px", letterSpacing:"0.05em" };
-function Field({ label, children, half }: { label: string, children: any, half?: boolean }) { return <div style={half?{flex:"1 1 140px"}:{}}><label style={lbl}>{label}</label>{children}</div>; }
+function Field({ label, children, half }) { return <div style={half?{flex:"1 1 140px"}:{}}><label style={lbl}>{label}</label>{children}</div>; }
 function Row({ children }) { return <div style={{display:"flex",gap:"12px",flexWrap:"wrap"}}>{children}</div>; }
 function SectionLabel({ children }) {
   return <div style={{fontSize:"11px",fontWeight:700,color:"#9ca3af",letterSpacing:"0.06em",borderBottom:"1px solid #f3f4f6",paddingBottom:"6px",marginBottom:"10px"}}>{children}</div>;
@@ -868,24 +868,28 @@ export default function Home() {
   return (
     <div style={{minHeight:"100vh",background:"#fff",fontFamily:"'Noto Sans JP','Hiragino Sans',sans-serif",color:"#111827"}}>
       <div style={{borderBottom:"1px solid #f3f4f6",background:"#fff",position:"sticky",top:0,zIndex:90}}>
-        <div style={{maxWidth:"720px",margin:"0 auto",padding:"0 16px",display:"flex",alignItems:"center",justifyContent:"space-between",height:"52px",gap:"8px"}}>
-          <div style={{display:"flex",alignItems:"center",gap:"8px",flexShrink:0}}>
-            <div style={{width:"22px",height:"22px",background:"#111827",borderRadius:"5px"}}/>
-            <span style={{fontSize:"14px",fontWeight:700,letterSpacing:"0.02em"}}>案件管理</span>
-          </div>
-          <div style={{display:"flex",alignItems:"center",gap:"2px"}}>
-            <button style={tabStyle("dashboard")} onClick={()=>setView("dashboard")}>ダッシュボード</button>
-            <button style={tabStyle("list")}      onClick={()=>setView("list")}>案件一覧</button>
-          </div>
-          <div style={{display:"flex",gap:"6px",flexShrink:0}}>
-            <button onClick={()=>setMasterOpen(true)} style={{padding:"6px 10px",borderRadius:"6px",border:"1px solid #e5e7eb",background:"#fff",color:"#374151",fontSize:"12px",fontWeight:600,cursor:"pointer"}}>紹介先管理</button>
-            <button onClick={()=>setFeeOpen(true)}    style={{padding:"6px 10px",borderRadius:"6px",border:"1px solid #e5e7eb",background:"#fff",color:"#374151",fontSize:"12px",fontWeight:600,cursor:"pointer"}}>手数料率</button>
-            <button onClick={()=>setSettingsOpen(true)} style={{padding:"6px 10px",borderRadius:"6px",border:`1px solid ${settingsIncomplete?"#fcd34d":"#e5e7eb"}`,background:settingsIncomplete?"#fffbeb":"#fff",color:settingsIncomplete?"#92400e":"#374151",fontSize:"12px",fontWeight:600,cursor:"pointer"}}>
-              {settingsIncomplete?"⚠ 設定":"設定"}
-            </button>
-          </div>
-        </div>
-      </div>
+  <div style={{maxWidth:"720px",margin:"0 auto",padding:"0 12px",display:"flex",alignItems:"center",justifyContent:"space-between",height:"52px",gap:"8px"}}>
+    <div style={{display:"flex",alignItems:"center",gap:"8px",flexShrink:0}}>
+      <div style={{width:"22px",height:"22px",background:"#111827",borderRadius:"5px"}}/>
+      <span style={{fontSize:"14px",fontWeight:700,letterSpacing:"0.02em"}}>案件管理</span>
+    </div>
+    <div style={{display:"flex",alignItems:"center",gap:"2px",flexShrink:0}}>
+      <button style={tabStyle("dashboard")} onClick={()=>setView("dashboard")}>
+        <span style={{display:"none"}}>ダッシュボード</span>
+        <span style={{fontSize:"18px"}}>📊</span>
+      </button>
+      <button style={tabStyle("list")} onClick={()=>setView("list")}>
+        <span style={{display:"none"}}>案件一覧</span>
+        <span style={{fontSize:"18px"}}>📋</span>
+      </button>
+    </div>
+    <div style={{display:"flex",gap:"4px",flexShrink:0}}>
+      <button onClick={()=>setMasterOpen(true)} style={{padding:"5px 8px",borderRadius:"6px",border:"1px solid #e5e7eb",background:"#fff",color:"#374151",fontSize:"11px",fontWeight:600,cursor:"pointer"}}>紹介先</button>
+      <button onClick={()=>setFeeOpen(true)} style={{padding:"5px 8px",borderRadius:"6px",border:"1px solid #e5e7eb",background:"#fff",color:"#374151",fontSize:"11px",fontWeight:600,cursor:"pointer"}}>手数料</button>
+      <button onClick={()=>setSettingsOpen(true)} style={{padding:"5px 8px",borderRadius:"6px",border:`1px solid ${settingsIncomplete?"#fcd34d":"#e5e7eb"}`,background:settingsIncomplete?"#fffbeb":"#fff",color:settingsIncomplete?"#92400e":"#374151",fontSize:"11px",fontWeight:600,cursor:"pointer"}}>{settingsIncomplete?"⚠設定":"設定"}</button>
+    </div>
+  </div>
+</div>
 
       <div style={{maxWidth:"720px",margin:"0 auto",padding:"24px 16px 100px"}}>
 
