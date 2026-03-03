@@ -621,7 +621,15 @@ function CompanyMasterModal({ companies, onClose, onSave }) {
             <div style={{display:"flex",flexDirection:"column",gap:"10px"}}>
               <Field label="請求先会社名"><input style={inp} value={cur.bill_company||""} onChange={e=>setF("bill_company",e.target.value)} placeholder="請求書に記載される会社名"/></Field>
               <Field label="担当者名"><input style={inp} value={cur.bill_contact||""} onChange={e=>setF("bill_contact",e.target.value)} placeholder="山田 太郎"/></Field>
-              <Field label="事業者登録番号（T番号）"><input style={inp} value={cur.tax_id||""} onChange={e=>setF("tax_id",e.target.value)} placeholder="T1234567890123"/></Field>
+              <Field label="事業者登録番号（T番号）">
+  <div style={{display:"flex",alignItems:"center",gap:"6px"}}>
+    <span style={{fontSize:"14px",fontWeight:700,color:"#374151",flexShrink:0}}>T</span>
+    <input style={inp} value={(cur.tax_id||"").replace(/^T/,"")} maxLength={13}
+      onChange={e=>{const v=e.target.value.replace(/\D/g,"").slice(0,13);setF("tax_id",v?"T"+v:"");}}
+      placeholder="1234567890123"/>
+  </div>
+  {cur.tax_id&&cur.tax_id.length!==14&&<p style={{fontSize:"11px",color:"#f87171",marginTop:"4px"}}>13桁で入力してください</p>}
+</Field>
             </div>
           </div>
           <div style={{display:"flex",justifyContent:"flex-end"}}>
@@ -1015,6 +1023,10 @@ export default function Home() {
                           })}
                         </div>
                       )}
+                      <button onClick={e=>{e.stopPropagation();handleDelete(c.id);}}
+                        style={{marginTop:"6px",padding:"3px 10px",borderRadius:"5px",border:"1px solid #fecaca",background:"#fef2f2",color:"#f87171",fontSize:"11px",fontWeight:600,cursor:"pointer"}}>
+                        削除
+                      </button>
                     </div>
                   </div>
                   {c.notes&&<div style={{marginTop:"10px",fontSize:"12px",color:"#6b7280",borderTop:"1px solid #f3f4f6",paddingTop:"8px"}}>{c.notes}</div>}
