@@ -894,7 +894,7 @@ export default function Home() {
               {[{label:"総案件数",value:`${cases.length}件`},{label:"成約件数",value:`${contracted.length}件`,sub:`成約率 ${contractRate}%`},{label:"累計成約金額",value:`¥${(totalAmount/10000).toFixed(0)}万`}].map(({label,value,sub})=>(
                 <div key={label} style={{padding:"16px",borderRadius:"10px",border:"1px solid #f3f4f6",background:"#fafafa"}}>
                   <div style={{fontSize:"11px",color:"#9ca3af",fontWeight:600,marginBottom:"8px",letterSpacing:"0.04em"}}>{label}</div>
-                  <div style={{fontSize:"22px",fontWeight:700,color:"#111827",lineHeight:1}}>{value}</div>
+                  <div style={{fontSize:"22px",fontWeight:700,color:"#111827",lineHeight:1,whiteSpace:"nowrap"}}>{value}</div>
                   {sub&&<div style={{fontSize:"11px",color:"#9ca3af",marginTop:"5px"}}>{sub}</div>}
                 </div>
               ))}
