@@ -36,26 +36,26 @@ const MONTH_LABELS = {"2025-01":"2025年1月","2025-02":"2025年2月","2025-03":
 const MONTH_SHORT  = {"2025-01":"1月","2025-02":"2月","2025-03":"3月","2025-04":"4月"};
 
 // ── Helpers ────────────────────────────────────────────
-const fmt      = v => (v!=null&&v!==""&&!isNaN(v)) ? "¥"+Number(v).toLocaleString() : "—";
+const fmt      = (v: any) => (v!=null&&v!==""&&!isNaN(v)) ? "¥"+Number(v).toLocaleString() : "—";
 const today    = () => new Date().toISOString().slice(0,10);
-const addMonth = d => { const dt=new Date(d); dt.setMonth(dt.getMonth()+1); return dt.toISOString().slice(0,10); };
-const fmtDate  = d => { if(!d)return "—"; const [y,m,day]=d.split("-"); return `${y}/${m}/${day}`; };
+const addMonth = (d: string) => { const dt=new Date(d); dt.setMonth(dt.getMonth()+1); return dt.toISOString().slice(0,10); };
+const fmtDate  = (d: string|null) => { if(!d)return "—"; const [y,m,day]=d.split("-"); return `${y}/${m}/${day}`; };
 
-function calcFeeAmount(contractAmount, companyId, categoryId, feeRates) {
+function calcFeeAmount(contractAmount: number|null, companyId: string, categoryId: string, feeRates: FeeRateMap) {
   const rate = feeRates?.[companyId]?.[categoryId];
   if(!rate || !contractAmount) return "";
   return Math.floor(Number(contractAmount) * rate / 100);
 }
 
 // 案件の総成約金額（items合計）
-function totalContractAmount(c) {
+function totalContractAmount(c: Case) {
   return (c.items||[]).reduce((s,it)=>s+(Number(it.contract_amount)||0), 0);
 }
 
 // ── Shared styles ──────────────────────────────────────
 const inp = { width:"100%", padding:"8px 10px", borderRadius:"6px", border:"1px solid #e5e7eb", fontSize:"14px", color:"#111827", background:"#fff", boxSizing:"border-box", outline:"none", fontFamily:"inherit" };
 const lbl = { display:"block", fontSize:"11px", fontWeight:600, color:"#9ca3af", marginBottom:"5px", letterSpacing:"0.05em" };
-function Field({ label, children, half }) { return <div style={half?{flex:"1 1 140px"}:{}}><label style={lbl}>{label}</label>{children}</div>; }
+function Field({ label, children, half }: { label: string, children: any, half?: boolean }) { return <div style={half?{flex:"1 1 140px"}:{}}><label style={lbl}>{label}</label>{children}</div>; }
 function Row({ children }) { return <div style={{display:"flex",gap:"12px",flexWrap:"wrap"}}>{children}</div>; }
 function SectionLabel({ children }) {
   return <div style={{fontSize:"11px",fontWeight:700,color:"#9ca3af",letterSpacing:"0.06em",borderBottom:"1px solid #f3f4f6",paddingBottom:"6px",marginBottom:"10px"}}>{children}</div>;
