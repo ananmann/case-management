@@ -31,9 +31,12 @@ const PALETTE = ["#3b82f6","#8b5cf6","#06b6d4","#10b981","#f59e0b","#ef4444"];
 
 
 
-const MONTHS = ["2025-01","2025-02","2025-03","2025-04"];
-const MONTH_LABELS = {"2025-01":"2025年1月","2025-02":"2025年2月","2025-03":"2025年3月","2025-04":"2025年4月"};
-const MONTH_SHORT  = {"2025-01":"1月","2025-02":"2月","2025-03":"3月","2025-04":"4月"};
+const MONTHS = Array.from({length:12},(_,i)=>{
+  const d = new Date(); d.setMonth(d.getMonth()-11+i);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+});
+const MONTH_LABELS = Object.fromEntries(MONTHS.map(m=>[m,`${m.slice(0,4)}年${String(parseInt(m.slice(5)))}月`]));
+const MONTH_SHORT  = Object.fromEntries(MONTHS.map(m=>[m,`${String(parseInt(m.slice(5)))}月`]));
 
 // ── Helpers ────────────────────────────────────────────
 const fmt      = (v: any) => (v!=null&&v!==""&&!isNaN(v)) ? "¥"+Number(v).toLocaleString() : "—";
