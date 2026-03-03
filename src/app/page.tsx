@@ -868,28 +868,22 @@ export default function Home() {
   return (
     <div style={{minHeight:"100vh",background:"#fff",fontFamily:"'Noto Sans JP','Hiragino Sans',sans-serif",color:"#111827"}}>
       <div style={{borderBottom:"1px solid #f3f4f6",background:"#fff",position:"sticky",top:0,zIndex:90}}>
-  <div style={{maxWidth:"720px",margin:"0 auto",padding:"0 12px",display:"flex",alignItems:"center",justifyContent:"space-between",height:"52px",gap:"8px"}}>
-    <div style={{display:"flex",alignItems:"center",gap:"8px",flexShrink:0}}>
-      <div style={{width:"22px",height:"22px",background:"#111827",borderRadius:"5px"}}/>
-      <span style={{fontSize:"14px",fontWeight:700,letterSpacing:"0.02em"}}>案件管理</span>
-    </div>
-    <div style={{display:"flex",alignItems:"center",gap:"2px",flexShrink:0}}>
-      <button style={tabStyle("dashboard")} onClick={()=>setView("dashboard")}>
-        <span style={{display:"none"}}>ダッシュボード</span>
-        <span style={{fontSize:"18px"}}>📊</span>
-      </button>
-      <button style={tabStyle("list")} onClick={()=>setView("list")}>
-        <span style={{display:"none"}}>案件一覧</span>
-        <span style={{fontSize:"18px"}}>📋</span>
-      </button>
-    </div>
-    <div style={{display:"flex",gap:"4px",flexShrink:0}}>
-      <button onClick={()=>setMasterOpen(true)} style={{padding:"5px 8px",borderRadius:"6px",border:"1px solid #e5e7eb",background:"#fff",color:"#374151",fontSize:"11px",fontWeight:600,cursor:"pointer"}}>紹介先</button>
-      <button onClick={()=>setFeeOpen(true)} style={{padding:"5px 8px",borderRadius:"6px",border:"1px solid #e5e7eb",background:"#fff",color:"#374151",fontSize:"11px",fontWeight:600,cursor:"pointer"}}>手数料</button>
-      <button onClick={()=>setSettingsOpen(true)} style={{padding:"5px 8px",borderRadius:"6px",border:`1px solid ${settingsIncomplete?"#fcd34d":"#e5e7eb"}`,background:settingsIncomplete?"#fffbeb":"#fff",color:settingsIncomplete?"#92400e":"#374151",fontSize:"11px",fontWeight:600,cursor:"pointer"}}>{settingsIncomplete?"⚠設定":"設定"}</button>
-    </div>
-  </div>
-</div>
+        <div style={{maxWidth:"720px",margin:"0 auto",padding:"0 10px",display:"flex",alignItems:"center",justifyContent:"space-between",height:"52px",gap:"6px"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"6px",flexShrink:0}}>
+            <div style={{width:"20px",height:"20px",background:"#111827",borderRadius:"4px",flexShrink:0}}/>
+            <span style={{fontSize:"13px",fontWeight:700,letterSpacing:"0.02em",whiteSpace:"nowrap"}}>案件管理</span>
+          </div>
+        <div style={{display:"flex",alignItems:"center",gap:"2px",flexShrink:0}}>
+        <button style={tabStyle("dashboard")} onClick={()=>setView("dashboard")}>DB</button>
+        <button style={tabStyle("list")} onClick={()=>setView("list")}>一覧</button>
+        </div>
+        <div style={{display:"flex",gap:"4px",flexShrink:0}}>
+            <button onClick={()=>setMasterOpen(true)} style={{padding:"5px 7px",borderRadius:"6px",border:"1px solid #e5e7eb",background:"#fff",color:"#374151",fontSize:"11px",fontWeight:600,cursor:"pointer",whiteSpace:"nowrap"}}>紹介先</button>
+            <button onClick={()=>setFeeOpen(true)} style={{padding:"5px 7px",borderRadius:"6px",border:"1px solid #e5e7eb",background:"#fff",color:"#374151",fontSize:"11px",fontWeight:600,cursor:"pointer",whiteSpace:"nowrap"}}>手数料</button>
+            <button onClick={()=>setSettingsOpen(true)} style={{padding:"5px 7px",borderRadius:"6px",border:`1px solid ${settingsIncomplete?"#fcd34d":"#e5e7eb"}`,background:settingsIncomplete?"#fffbeb":"#fff",color:settingsIncomplete?"#92400e":"#374151",fontSize:"11px",fontWeight:600,cursor:"pointer",whiteSpace:"nowrap"}}>{settingsIncomplete?"⚠ 設定":"設定"}</button>
+          </div>
+        </div>
+      </div>
 
       <div style={{maxWidth:"720px",margin:"0 auto",padding:"24px 16px 100px"}}>
 
