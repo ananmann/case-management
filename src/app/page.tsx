@@ -7,6 +7,7 @@ import {
   getFeeRates, saveFeeRates,
   getCases, createCase, updateCase, bulkUpdateStatus,
   getAppSettings, saveAppSettings,
+  deleteCase, restoreCase,
 } from '@/lib/api'
 import type { Case, CaseItem, Company, Category, FeeRateMap, AppSettings } from '@/lib/types'
 
@@ -878,6 +879,12 @@ export default function Home() {
   async function handleBulkStatus(ids: string[]) {
     await bulkUpdateStatus(ids, "invoiced")
     setCases(p=>p.map(c=>ids.includes(c.id)?{...c,status:"invoiced" as const}:c))
+  }
+
+  async function handleDelete(id: string) {
+    if(!confirm('この案件を削除しますか？\n（あとからSupabaseで復元できます）')) return
+    await deleteCase(id)
+    setCases(p=>p.filter(c=>c.id!==id))
   }
 
   const coLabel=id=>companies.find(c=>c.id===id)?.label||id;

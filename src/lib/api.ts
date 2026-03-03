@@ -91,6 +91,7 @@ export async function getCases(): Promise<Case[]> {
   const { data, error } = await supabase
     .from('cases')
     .select(`*, items:case_items(*)`)
+    .is('deleted_at', null)
     .order('created_at', { ascending: false })
   if (error) throw error
   return data
@@ -179,5 +180,21 @@ export async function saveAppSettings(settings: Partial<AppSettings>): Promise<v
     .from('app_settings')
     .update(settings)
     .eq('id', 1)
+  if (error) throw error
+}
+// ── Delete / Restore Cases ─────────────────────────────
+export async function deleteCase(id: string): Promise<void> {
+  const { error } = await supabase
+    .from('cases')
+    .update({ deleted_at: new Date().toISOString() })
+    .eq('id', id)
+  if (error) throw error
+}
+
+export async function restoreCase(id: string): Promise<void> {
+  const { error } = await supabase
+    .from('cases')
+    .update({ deleted_at: null })
+    .eq('id', id)
   if (error) throw error
 }
