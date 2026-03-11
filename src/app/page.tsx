@@ -504,7 +504,7 @@ function FeeRateModal({ companies, categories, feeRates, onClose, onSave }) {
           ) : (
             <div style={{borderRadius:"8px",overflow:"hidden",border:"1px solid #e5e7eb",overflowX:"auto"}}>
               {/* header row */}
-              <div style={{display:"grid",gridTemplateColumns:`150px repeat(${colCount},1fr)`,background:"#f9fafb",borderBottom:"1px solid #e5e7eb"}}>
+              <div style={{display:"grid",gridTemplateColumns:`150px repeat(${colCount},90px)`,background:"#f9fafb",borderBottom:"1px solid #e5e7eb",minWidth:`${150+colCount*90}px`}}>
                 <div style={{padding:"10px 14px",fontSize:"11px",fontWeight:700,color:"#9ca3af"}}></div>
                 {cats.map(cat=>(
                   <div key={cat.id} style={{padding:"10px 8px",fontSize:"11px",fontWeight:700,color:"#374151",textAlign:"center",borderLeft:"1px solid #e5e7eb"}}>
@@ -514,7 +514,7 @@ function FeeRateModal({ companies, categories, feeRates, onClose, onSave }) {
               </div>
               {/* company rows */}
               {companies.map((co,ci)=>(
-                <div key={co.id} style={{display:"grid",gridTemplateColumns:`150px repeat(${colCount},1fr)`,background:ci%2===0?"#fff":"#fafafa",borderTop:ci===0?"none":"1px solid #f3f4f6"}}>
+                <div key={co.id} style={{display:"grid",gridTemplateColumns:`150px repeat(${colCount},90px)`,minWidth:`${150+colCount*90}px`,background:ci%2===0?"#fff":"#fafafa",borderTop:ci===0?"none":"1px solid #f3f4f6"}}>
                   <div style={{padding:"10px 14px",display:"flex",alignItems:"center",gap:"8px"}}>
                     <div style={{width:"8px",height:"8px",borderRadius:"2px",background:co.color,flexShrink:0}}/>
                     <span style={{fontSize:"13px",fontWeight:600,color:"#374151",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{co.label}</span>
