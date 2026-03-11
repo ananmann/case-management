@@ -14,6 +14,7 @@ export type Company = {
   bill_contact: string
   tax_id: string
   sort_order: number
+  issuer_id: number
 }
 
 export type FeeRate = {
@@ -52,6 +53,8 @@ export type AppSettings = {
   invoice_tax_id: string
   stamp_image: string
 }
+
+export type Issuer = AppSettings
 
 // 手数料率をネストした形式（UI用）
 export type FeeRateMap = {

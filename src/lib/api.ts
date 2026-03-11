@@ -166,20 +166,25 @@ export async function bulkUpdateStatus(ids: string[], status: string): Promise<v
 }
 
 // ── App Settings ───────────────────────────────────────
-export async function getAppSettings(): Promise<AppSettings> {
+export async function getAppSettings(): Promise<AppSettings[]> {
   const { data, error } = await supabase
     .from('app_settings')
     .select('*')
-    .single()
+    .order('id')
   if (error) throw error
-  return data
+  // 2件なければ補完
+  const result: AppSettings[] = [
+    data.find((d: AppSettings) => d.id === 1) || { id:1, company_name:"", company_zip:"", company_addr:"", bank_info:"", invoice_tax_id:"", stamp_image:"" },
+    data.find((d: AppSettings) => d.id === 2) || { id:2, company_name:"", company_zip:"", company_addr:"", bank_info:"", invoice_tax_id:"", stamp_image:"" },
+  ]
+  return result
 }
 
 export async function saveAppSettings(settings: Partial<AppSettings>): Promise<void> {
   const { error } = await supabase
     .from('app_settings')
     .update(settings)
-    .eq('id', 1)
+    .eq('id', settings.id)
   if (error) throw error
 }
 // ── Delete / Restore Cases ─────────────────────────────

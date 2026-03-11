@@ -200,6 +200,7 @@ function MonthlyInvoiceModal({ cases, companies, categories, settings, feeRates,
   const [showBulk,    setShowBulk]    = useState(false);
 
   const co = companies.find(c=>c.id===selCompany);
+  const issuer = settings[(co?.issuer_id||1)-1] || settings[0];
 
   // 成約案件を items×カテゴリで明細行に展開
   function buildLines() {
@@ -245,7 +246,7 @@ function MonthlyInvoiceModal({ cases, companies, categories, settings, feeRates,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           invoiceNo, issueDate, month: selMonth,
-          co, lines: included, notes, settings
+          co, lines: included, notes, settings: issuer
         }),
       })
       if (!res.ok) throw new Error('PDF生成失敗')
@@ -501,7 +502,7 @@ function FeeRateModal({ companies, categories, feeRates, onClose, onSave }) {
               カテゴリを追加してください
             </div>
           ) : (
-            <div style={{borderRadius:"8px",overflow:"hidden",border:"1px solid #e5e7eb"}}>
+            <div style={{borderRadius:"8px",overflow:"hidden",border:"1px solid #e5e7eb",overflowX:"auto"}}>
               {/* header row */}
               <div style={{display:"grid",gridTemplateColumns:`150px repeat(${colCount},1fr)`,background:"#f9fafb",borderBottom:"1px solid #e5e7eb"}}>
                 <div style={{padding:"10px 14px",fontSize:"11px",fontWeight:700,color:"#9ca3af"}}></div>
@@ -541,45 +542,53 @@ function FeeRateModal({ companies, categories, feeRates, onClose, onSave }) {
 
 // ── Settings Modal ─────────────────────────────────────
 function SettingsModal({ settings, onClose, onSave }) {
-  const [form,setForm]=useState({...settings});
-  const set=(k,v)=>setForm(f=>({...f,[k]:v}));
-  const stampRef=useRef();
-  function handleStamp(e){const file=e.target.files[0];if(!file)return;const r=new FileReader();r.onload=ev=>set("stamp_image",ev.target.result);r.readAsDataURL(file);}
+  const [tab, setTab] = useState(0);
+  const s = settings[tab] || settings[0];
+  const [form, setForm] = useState(s);
+  const set = (k,v) => setForm(f=>({...f,[k]:v}));
+
+  useEffect(() => {
+    setForm(settings[tab] || settings[0]);
+  }, [tab]);
+
   return (
-    <Overlay><ModalBox maxWidth="500px">
-      <ModalHeader title="アプリ設定" sub="発行会社情報は請求書に反映されます"/>
-      <div style={{padding:"0 24px",display:"flex",flexDirection:"column",gap:"16px"}}>
-        <div>
-          <SectionLabel>発行会社情報（自社）</SectionLabel>
-          <div style={{display:"flex",flexDirection:"column",gap:"10px"}}>
-            <Field label="会社名"><input style={inp} value={form.company_name} onChange={e=>set("company_name",e.target.value)} placeholder="株式会社〇〇"/></Field>
-            <Row>
-              <Field label="郵便番号" half><input style={inp} value={form.company_zip} onChange={e=>set("company_zip",e.target.value)} placeholder="530-0001"/></Field>
-              <Field label="住所" half><input style={inp} value={form.company_addr} onChange={e=>set("company_addr",e.target.value)} placeholder="大阪府大阪市〇〇"/></Field>
-            </Row>
-            <Field label="インボイス登録番号（T番号）"><input style={inp} value={form.invoice_tax_id} onChange={e=>set("invoice_tax_id",e.target.value)} placeholder="T1234567890123"/></Field>
+    <Overlay><ModalBox>
+      <ModalHeader title="設定"/>
+      <div style={{display:"flex",borderBottom:"1px solid #f3f4f6",margin:"0 24px"}}>
+        {["会社1","会社2"].map((label,i)=>(
+          <button key={i} onClick={()=>setTab(i)}
+            style={{padding:"8px 20px",border:"none",background:"transparent",fontWeight:600,fontSize:"13px",cursor:"pointer",
+              borderBottom:tab===i?"2px solid #111827":"2px solid transparent",
+              color:tab===i?"#111827":"#9ca3af"}}>
+            {label}
+          </button>
+        ))}
+      </div>
+      <div style={{padding:"16px 24px 4px",display:"flex",flexDirection:"column",gap:"14px"}}>
+        <Field label="会社名"><input style={inp} value={form.company_name} onChange={e=>set("company_name",e.target.value)} placeholder="株式会社〇〇"/></Field>
+        <Row>
+          <Field label="郵便番号" half><input style={inp} value={form.company_zip} onChange={e=>set("company_zip",e.target.value)} placeholder="000-0000"/></Field>
+          <Field label="住所" half><input style={inp} value={form.company_addr} onChange={e=>set("company_addr",e.target.value)} placeholder="東京都〇〇区..."/></Field>
+        </Row>
+        <Field label="インボイス登録番号（T番号）">
+          <div style={{display:"flex",alignItems:"center",gap:"6px"}}>
+            <span style={{fontSize:"14px",fontWeight:700,color:"#374151",flexShrink:0}}>T</span>
+            <input style={inp} value={(form.invoice_tax_id||"").replace(/^T/,"")} maxLength={13}
+              onChange={e=>{const v=e.target.value.replace(/\D/g,"").slice(0,13);set("invoice_tax_id",v?"T"+v:"");}}
+              placeholder="1234567890123"/>
           </div>
-        </div>
-        <div>
-          <SectionLabel>会社印</SectionLabel>
-          <div style={{display:"flex",alignItems:"center",gap:"16px"}}>
-            <div style={{width:"72px",height:"72px",border:"1px solid #e5e7eb",borderRadius:"8px",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:"#f9fafb"}}>
-              {form.stamp_image?<img src={form.stamp_image} style={{width:"100%",height:"100%",objectFit:"contain"}}/>:<span style={{fontSize:"11px",color:"#d1d5db"}}>未設定</span>}
-            </div>
-            <div>
-              <button onClick={()=>stampRef.current.click()} style={{padding:"7px 16px",borderRadius:"6px",border:"1px solid #e5e7eb",background:"#fff",color:"#374151",fontSize:"13px",fontWeight:600,cursor:"pointer",display:"block",marginBottom:"6px"}}>画像を選択</button>
-              <p style={{fontSize:"11px",color:"#9ca3af"}}>PNG / JPG。透過PNG推奨。</p>
-              {form.stamp_image&&<button onClick={()=>set("stamp_image","")} style={{marginTop:"6px",padding:"4px 10px",borderRadius:"5px",border:"1px solid #fecaca",background:"#fef2f2",color:"#f87171",fontSize:"11px",fontWeight:600,cursor:"pointer"}}>削除</button>}
-            </div>
-            <input ref={stampRef} type="file" accept="image/*" onChange={handleStamp} style={{display:"none"}}/>
-          </div>
-        </div>
-        <div>
-          <SectionLabel>振込先情報</SectionLabel>
-          <Field label="振込先（複数行可）">
-            <textarea style={{...inp,height:"80px",resize:"vertical"}} value={form.bank_info} onChange={e=>set("bank_info",e.target.value)} placeholder={"〇〇銀行 〇〇支店\n普通 1234567\nカ）〇〇〇〇"}/>
-          </Field>
-        </div>
+          {form.invoice_tax_id&&form.invoice_tax_id.length!==14&&<p style={{fontSize:"11px",color:"#f87171",marginTop:"4px"}}>13桁で入力してください</p>}
+        </Field>
+        <Field label="口座情報"><textarea style={{...inp,height:"70px",resize:"vertical"}} value={form.bank_info} onChange={e=>set("bank_info",e.target.value)} placeholder="〇〇銀行 〇〇支店 普通 1234567"/></Field>
+        <Field label="会社印（画像）">
+          <input type="file" accept="image/*" onChange={e=>{
+            const file=e.target.files?.[0]; if(!file)return;
+            const reader=new FileReader();
+            reader.onload=ev=>set("stamp_image",ev.target?.result as string);
+            reader.readAsDataURL(file);
+          }}/>
+          {form.stamp_image&&<img src={form.stamp_image} style={{width:"80px",height:"80px",objectFit:"contain",marginTop:"8px",border:"1px solid #e5e7eb",borderRadius:"8px"}} alt="印鑑"/>}
+        </Field>
       </div>
       <ModalFooter onClose={onClose} onSave={()=>onSave(form)} saveLabel="保存する"/>
     </ModalBox></Overlay>
@@ -630,6 +639,19 @@ function CompanyMasterModal({ companies, onClose, onSave }) {
   </div>
   {cur.tax_id&&cur.tax_id.length!==14&&<p style={{fontSize:"11px",color:"#f87171",marginTop:"4px"}}>13桁で入力してください</p>}
 </Field>
+              <Field label="発行元会社">
+                <div style={{display:"flex",gap:"8px"}}>
+                  {[{id:1,label:"会社1"},{id:2,label:"会社2"}].map(co=>(
+                    <button key={co.id} onClick={()=>setF("issuer_id",co.id)}
+                      style={{flex:1,padding:"8px",borderRadius:"7px",fontWeight:600,fontSize:"13px",cursor:"pointer",
+                        border:`1.5px solid ${(cur.issuer_id||1)===co.id?"#111827":"#e5e7eb"}`,
+                        background:(cur.issuer_id||1)===co.id?"#111827":"#fff",
+                        color:(cur.issuer_id||1)===co.id?"#fff":"#9ca3af"}}>
+                      {co.label}
+                    </button>
+                  ))}
+                </div>
+              </Field>
             </div>
           </div>
           <div style={{display:"flex",justifyContent:"flex-end"}}>
@@ -824,7 +846,10 @@ function BarChartByCompany({ cases, companies }) {
 export default function Home() {
   const [cases,        setCases]        = useState<Case[]>([]);
   const [companies,    setCompanies]    = useState<Company[]>([]);
-  const [settings,     setSettings]     = useState<AppSettings>({ id:1, company_name:"", company_zip:"", company_addr:"", bank_info:"", invoice_tax_id:"", stamp_image:"" });
+  const [settings, setSettings] = useState<AppSettings[]>([
+    { id:1, company_name:"", company_zip:"", company_addr:"", bank_info:"", invoice_tax_id:"", stamp_image:"" },
+    { id:2, company_name:"", company_zip:"", company_addr:"", bank_info:"", invoice_tax_id:"", stamp_image:"" },
+  ]);
   const [categories,   setCategories]   = useState<Category[]>([]);
   const [feeRates,     setFeeRates]     = useState<FeeRateMap>({});
   const [loading,      setLoading]      = useState(true);
@@ -851,7 +876,7 @@ export default function Home() {
         setCompanies(cos)
         setFeeRates(fees)
         setCases(cas)
-        setSettings(sets)
+        setSettings(sets as AppSettings[])
       } catch(e) { console.error(e) }
       finally { setLoading(false) }
     }
@@ -1043,7 +1068,7 @@ export default function Home() {
 
       {modal&&<CaseModal onClose={()=>setModal(null)} onSave={handleSave} editCase={modal==="new"?null:modal} companies={companies} categories={categories}/>}
       {masterOpen&&<CompanyMasterModal companies={companies} onClose={()=>setMasterOpen(false)} onSave={async(list:Company[])=>{await saveCompanies(list);setCompanies(list);setMasterOpen(false);}}/>}
-      {settingsOpen&&<SettingsModal settings={settings} onClose={()=>setSettingsOpen(false)} onSave={async(s:AppSettings)=>{await saveAppSettings(s);setSettings(s);setSettingsOpen(false);}}/>}
+      {settingsOpen&&<SettingsModal settings={settings} onClose={()=>setSettingsOpen(false)} onSave={async(s:AppSettings)=>{await saveAppSettings(s);setSettings(p=>p.map(x=>x.id===s.id?s:x));setSettingsOpen(false);}}/>}
       {feeOpen&&<FeeRateModal companies={companies} categories={categories} feeRates={feeRates} onClose={()=>setFeeOpen(false)} onSave={async(cats:Category[],r:FeeRateMap)=>{await saveCategories(cats);await saveFeeRates(r);setCategories(cats);setFeeRates(r);setFeeOpen(false);}}/>}
       {invoiceOpen&&<MonthlyInvoiceModal cases={cases} companies={companies} categories={categories} settings={settings} feeRates={feeRates} onClose={()=>setInvoiceOpen(false)} onBulkStatusChange={handleBulkStatus}/>}
     </div>
